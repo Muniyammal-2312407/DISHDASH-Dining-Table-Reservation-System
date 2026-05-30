@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: restaurant_mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=restaurant_db
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - restaurant-network
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: restaurant_backend
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/restaurant_db
+      - JWT_SECRET=restaurant-jwt-secret-key-2024
+    depends_on:
+      - mongodb
+    networks:
+      - restaurant-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: restaurant_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - restaurant-network
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
+
+networks:
+  restaurant-network:
+    driver: bridge
