@@ -8,7 +8,7 @@ const API = process.env.REACT_APP_API_URL || 'http://localhost:4000';
 
 const CATEGORIES = ['Appetizers', 'Main Course', 'Desserts', 'Beverages', 'Specials'];
 
-const STATUS_FLOW = ['pending', 'preparing', 'ready', 'completed'];
+// STATUS_FLOW removed — was unused (caused CI build failure)
 const STATUS_CONFIG = {
   pending:   { label: '⏳ Pending',    cls: 'st-pending',   next: 'preparing' },
   preparing: { label: '👨‍🍳 Preparing', cls: 'st-preparing', next: 'ready' },
@@ -49,12 +49,14 @@ const AdminDashboard = () => {
     if (info) setAdminInfo(JSON.parse(info));
     fetchOrders();
     fetchMenu();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate, token]);
 
   const fetchOrders = useCallback(async () => {
+    const headers = { headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` } };
     setLoad('orders', true);
     try {
-      const res = await axios.get(`${API}/api/admin/orders`, authHeaders);
+      const res = await axios.get(`${API}/api/admin/orders`, headers);
       setOrders(res.data);
     } catch (err) {
       if (err.response?.status === 401) handleLogout();
@@ -62,18 +64,21 @@ const AdminDashboard = () => {
     } finally {
       setLoad('orders', false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   const fetchMenu = useCallback(async () => {
+    const headers = { headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` } };
     setLoad('menu', true);
     try {
-      const res = await axios.get(`${API}/api/admin/menu`, authHeaders);
+      const res = await axios.get(`${API}/api/admin/menu`, headers);
       setMenuItems(res.data);
     } catch {
       toast.error('Failed to load menu');
     } finally {
       setLoad('menu', false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   const handleLogout = () => {

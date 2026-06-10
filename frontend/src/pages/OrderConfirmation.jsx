@@ -33,7 +33,6 @@ const OrderConfirmation = () => {
   if (!order) return null;
 
   const isOnline = order.paymentType === 'online';
-  const paymentStatus = isOnline ? 'paid' : 'pay at counter';
 
   return (
     <div className="confirm-page">
