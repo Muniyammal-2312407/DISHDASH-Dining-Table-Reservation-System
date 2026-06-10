@@ -7,7 +7,7 @@ const Menu = () => {
 
   useEffect(() => {
     // Fetch menu items from backend
-    axios.get('http://localhost:4000/api/menu')
+    axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:4000'}/api/menu`)
       .then((response) => {
         setMenuItems(response.data);
         setLoading(false);

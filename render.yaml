@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: dishdash-backend
+    env: node
+    region: singapore
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false   # You will set this in Render dashboard
+      - key: JWT_SECRET
+        sync: false   # You will set this in Render dashboard
+    healthCheckPath: /
