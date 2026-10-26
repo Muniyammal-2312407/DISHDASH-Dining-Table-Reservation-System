@@ -11,12 +11,14 @@ const AdminLogin = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [seeding, setSeeding] = useState(false);
+
   const [form, setForm] = useState({
     username: '',
     email: '',
     password: '',
     confirmPassword: '',
-    restaurantName: '',
+    restaurantName: 'DISHDASH Restaurant',
     phone: '',
   });
   const [errors, setErrors] = useState({});
@@ -30,16 +32,18 @@ const AdminLogin = () => {
 
   const validate = () => {
     const errs = {};
-    if (!form.email) errs.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(form.email)) errs.email = 'Invalid email format';
+    if (!form.email.trim()) errs.email = 'Email is required';
+    else if (!/\S+@\S+\.\S+/.test(form.email)) errs.email = 'Enter a valid email address';
+
     if (!form.password) errs.password = 'Password is required';
-    else if (form.password.length < 6) errs.password = 'At least 6 characters';
+    else if (form.password.length < 6) errs.password = 'At least 6 characters required';
 
     if (!isLogin) {
-      if (!form.username) errs.username = 'Username is required';
-      if (!form.restaurantName) errs.restaurantName = 'Restaurant name is required';
-      if (form.password !== form.confirmPassword)
+      if (!form.username.trim()) errs.username = 'Username is required';
+      if (!form.restaurantName.trim()) errs.restaurantName = 'Restaurant name is required';
+      if (form.password !== form.confirmPassword) {
         errs.confirmPassword = 'Passwords do not match';
+      }
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -53,13 +57,13 @@ const AdminLogin = () => {
     try {
       const endpoint = isLogin ? '/api/auth/login' : '/api/auth/signup';
       const payload = isLogin
-        ? { email: form.email, password: form.password }
+        ? { email: form.email.trim(), password: form.password }
         : {
-            username: form.username,
-            email: form.email,
+            username: form.username.trim(),
+            email: form.email.trim(),
             password: form.password,
-            restaurantName: form.restaurantName,
-            phone: form.phone,
+            restaurantName: form.restaurantName.trim(),
+            phone: form.phone.trim(),
           };
 
       const response = await axios.post(`${API}${endpoint}`, payload);
@@ -68,7 +72,9 @@ const AdminLogin = () => {
       localStorage.setItem('adminInfo', JSON.stringify(response.data.admin));
 
       toast.success(
-        isLogin ? `Welcome back, ${response.data.admin.username}! 👋` : 'Account created! Welcome aboard! 🎉'
+        isLogin
+          ? `Welcome back, ${response.data.admin.username}!`
+          : 'Admin registered successfully! Redirecting...'
       );
       navigate('/admin');
     } catch (error) {
@@ -78,238 +84,243 @@ const AdminLogin = () => {
     }
   };
 
+  const handleFillDemoCreds = () => {
+    setIsLogin(true);
+    setForm(prev => ({
+      ...prev,
+      email: 'admin@dishdash.com',
+      password: 'admin123'
+    }));
+    setErrors({});
+    toast.info('Filled demo admin credentials.');
+  };
+
   const handleSeedData = async () => {
+    setSeeding(true);
     try {
       await axios.post(`${API}/api/seed-data`);
-      toast.success('Sample data created! Use: admin@foodheaven.com / admin123');
-    } catch {
-      toast.error('Failed to create sample data');
+      toast.success('Sample dishes & admin account verified!');
+      handleFillDemoCreds();
+    } catch (err) {
+      toast.error('Could not run seed endpoint. Ensure server is online.');
+    } finally {
+      setSeeding(false);
     }
   };
 
   const switchMode = () => {
     setIsLogin(!isLogin);
     setErrors({});
-    setForm({ username: '', email: '', password: '', confirmPassword: '', restaurantName: '', phone: '' });
   };
 
   return (
     <div className="admin-login-page">
-      <div className="al-bg-glow" />
-
-      {/* Back button */}
-      <button className="al-back-btn" onClick={() => navigate('/')}>
-        ← Back to Home
-      </button>
-
-      <div className="al-container">
-        {/* Left Panel */}
-        <div className="al-left">
-          <div className="al-logo">
-            <span className="al-logo-icon">👨‍💼</span>
-            <h1>Admin Portal</h1>
-          </div>
-          <p className="al-description">
-            Manage your restaurant operations, menu items, orders, and track real-time performance all from one dashboard.
-          </p>
-
-          <div className="al-features">
-            <div className="al-feature">
-              <span>📊</span>
-              <div>
-                <strong>Dashboard Analytics</strong>
-                <p>Real-time revenue and order tracking</p>
-              </div>
-            </div>
-            <div className="al-feature">
-              <span>🍽️</span>
-              <div>
-                <strong>Menu Management</strong>
-                <p>Add, edit and manage menu items</p>
-              </div>
-            </div>
-            <div className="al-feature">
-              <span>📦</span>
-              <div>
-                <strong>Order Control</strong>
-                <p>Track and update order statuses</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Demo Credentials */}
-          <div className="al-demo-box">
-            <p className="demo-label">🔑 Demo Admin Credentials</p>
-            <div className="demo-creds">
-              <span>📧 admin@foodheaven.com</span>
-              <span>🔒 admin123</span>
-            </div>
-            <button className="seed-btn" onClick={handleSeedData}>
-              🗃️ Create Sample Data First
-            </button>
+      {/* Top Bar */}
+      <header className="al-topbar">
+        <div className="al-topbar-inner">
+          <button type="button" className="btn-back-home" onClick={() => navigate('/')}>
+            ← Back to Customer Home
+          </button>
+          <div className="al-brand">
+            <span className="brand-logo">DISHDASH</span>
+            <span className="brand-badge-admin">Admin Portal</span>
           </div>
         </div>
+      </header>
 
-        {/* Right Panel - Form */}
-        <div className="al-right">
-          <div className="al-form-card">
-            {/* Tab Toggle */}
-            <div className="al-tabs">
-              <button
-                className={`al-tab ${isLogin ? 'active' : ''}`}
-                onClick={() => setIsLogin(true)}
-              >
-                🔐 Login
-              </button>
-              <button
-                className={`al-tab ${!isLogin ? 'active' : ''}`}
-                onClick={() => setIsLogin(false)}
-              >
-                📝 Sign Up
-              </button>
+      {/* Main Container */}
+      <main className="al-main">
+        <div className="al-card-shell">
+          {/* Left: Overview & Demo Helper */}
+          <div className="al-left-info">
+            <div className="al-pill">Staff & Manager Access</div>
+            <h2>Restaurant Operations Portal</h2>
+            <p className="al-desc">
+              Monitor incoming table orders, update kitchen preparation stages, and manage dish availability on the fly.
+            </p>
+
+            <div className="al-feature-list">
+              <div className="al-feature-item">
+                <span className="feat-icon">📊</span>
+                <div>
+                  <strong>Live Table & Order Overview</strong>
+                  <p>Track pending, cooking, and ready orders in real-time.</p>
+                </div>
+              </div>
+
+              <div className="al-feature-item">
+                <span className="feat-icon">🍽️</span>
+                <div>
+                  <strong>Menu & Stock Availability</strong>
+                  <p>Toggle items available or sold out directly from your dashboard.</p>
+                </div>
+              </div>
+
+              <div className="al-feature-item">
+                <span className="feat-icon">🛡️</span>
+                <div>
+                  <strong>Protected Session</strong>
+                  <p>Secured with JWT authentication and role authorization.</p>
+                </div>
+              </div>
             </div>
 
-            <div className="al-form-header">
-              <h2>{isLogin ? 'Welcome Back!' : 'Create Account'}</h2>
-              <p>{isLogin ? 'Sign in to your admin account' : 'Set up your restaurant admin'}</p>
+            {/* Demo Credentials Box */}
+            <div className="demo-credentials-card">
+              <div className="demo-card-head">
+                <span>🔑 Demo Interview Credentials</span>
+                <button
+                  type="button"
+                  className="btn-autofill"
+                  onClick={handleFillDemoCreds}
+                >
+                  Autofill
+                </button>
+              </div>
+              <div className="demo-card-body">
+                <div><strong>Email:</strong> admin@dishdash.com</div>
+                <div><strong>Password:</strong> admin123</div>
+              </div>
+              <button
+                type="button"
+                className="btn-seed-inline"
+                onClick={handleSeedData}
+                disabled={seeding}
+              >
+                {seeding ? 'Checking Database...' : 'Verify / Seed Sample Data'}
+              </button>
+            </div>
+          </div>
+
+          {/* Right: Authentication Form */}
+          <div className="al-right-form-wrap">
+            <div className="al-tab-selector">
+              <button
+                type="button"
+                className={`tab-btn ${isLogin ? 'active' : ''}`}
+                onClick={() => { setIsLogin(true); setErrors({}); }}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                className={`tab-btn ${!isLogin ? 'active' : ''}`}
+                onClick={() => { setIsLogin(false); setErrors({}); }}
+              >
+                Register New
+              </button>
             </div>
 
             <form onSubmit={handleSubmit} className="al-form">
-              {/* Signup-only fields */}
               {!isLogin && (
                 <>
                   <div className="al-field">
                     <label>Username *</label>
-                    <div className={`al-input-wrap ${errors.username ? 'error' : ''}`}>
-                      <span className="al-input-icon">👤</span>
-                      <input
-                        type="text"
-                        name="username"
-                        value={form.username}
-                        onChange={handleChange}
-                        placeholder="Choose a username"
-                      />
-                    </div>
-                    {errors.username && <span className="al-error">{errors.username}</span>}
+                    <input
+                      type="text"
+                      name="username"
+                      value={form.username}
+                      onChange={handleChange}
+                      placeholder="e.g. chef_anand"
+                    />
+                    {errors.username && <span className="field-err">{errors.username}</span>}
                   </div>
 
                   <div className="al-field">
                     <label>Restaurant Name *</label>
-                    <div className={`al-input-wrap ${errors.restaurantName ? 'error' : ''}`}>
-                      <span className="al-input-icon">🏪</span>
-                      <input
-                        type="text"
-                        name="restaurantName"
-                        value={form.restaurantName}
-                        onChange={handleChange}
-                        placeholder="Your restaurant name"
-                      />
-                    </div>
-                    {errors.restaurantName && <span className="al-error">{errors.restaurantName}</span>}
-                  </div>
-
-                  <div className="al-field">
-                    <label>Phone Number</label>
-                    <div className="al-input-wrap">
-                      <span className="al-input-icon">📞</span>
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={form.phone}
-                        onChange={handleChange}
-                        placeholder="Phone number (optional)"
-                      />
-                    </div>
+                    <input
+                      type="text"
+                      name="restaurantName"
+                      value={form.restaurantName}
+                      onChange={handleChange}
+                      placeholder="e.g. DISHDASH Bistro"
+                    />
+                    {errors.restaurantName && <span className="field-err">{errors.restaurantName}</span>}
                   </div>
                 </>
               )}
 
-              {/* Email */}
               <div className="al-field">
-                <label>Email Address *</label>
-                <div className={`al-input-wrap ${errors.email ? 'error' : ''}`}>
-                  <span className="al-input-icon">📧</span>
-                  <input
-                    type="email"
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    placeholder="Enter your email"
-                    autoComplete="email"
-                  />
-                </div>
-                {errors.email && <span className="al-error">{errors.email}</span>}
+                <label>Admin Email *</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="admin@dishdash.com"
+                />
+                {errors.email && <span className="field-err">{errors.email}</span>}
               </div>
 
-              {/* Password */}
               <div className="al-field">
                 <label>Password *</label>
-                <div className={`al-input-wrap ${errors.password ? 'error' : ''}`}>
-                  <span className="al-input-icon">🔒</span>
+                <div className="password-wrap">
                   <input
                     type={showPassword ? 'text' : 'password'}
                     name="password"
                     value={form.password}
                     onChange={handleChange}
-                    placeholder={isLogin ? 'Your password' : 'Min. 6 characters'}
-                    autoComplete={isLogin ? 'current-password' : 'new-password'}
+                    placeholder="••••••••"
                   />
                   <button
                     type="button"
-                    className="toggle-pw"
+                    className="btn-toggle-pwd"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? '🙈' : '👁️'}
+                    {showPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
-                {errors.password && <span className="al-error">{errors.password}</span>}
+                {errors.password && <span className="field-err">{errors.password}</span>}
               </div>
 
-              {/* Confirm Password */}
               {!isLogin && (
-                <div className="al-field">
-                  <label>Confirm Password *</label>
-                  <div className={`al-input-wrap ${errors.confirmPassword ? 'error' : ''}`}>
-                    <span className="al-input-icon">🔒</span>
+                <>
+                  <div className="al-field">
+                    <label>Confirm Password *</label>
                     <input
-                      type={showPassword ? 'text' : 'password'}
+                      type="password"
                       name="confirmPassword"
                       value={form.confirmPassword}
                       onChange={handleChange}
-                      placeholder="Repeat password"
+                      placeholder="••••••••"
+                    />
+                    {errors.confirmPassword && <span className="field-err">{errors.confirmPassword}</span>}
+                  </div>
+
+                  <div className="al-field">
+                    <label>Contact Phone (Optional)</label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={form.phone}
+                      onChange={handleChange}
+                      placeholder="+91 9876543210"
                     />
                   </div>
-                  {errors.confirmPassword && (
-                    <span className="al-error">{errors.confirmPassword}</span>
-                  )}
-                </div>
+                </>
               )}
 
-              <button type="submit" className="al-submit-btn" disabled={loading}>
-                {loading ? (
-                  <>
-                    <span className="spinner" />
-                    {isLogin ? 'Signing In...' : 'Creating Account...'}
-                  </>
-                ) : (
-                  isLogin ? '🔐 Sign In to Dashboard' : '🚀 Create Admin Account'
-                )}
+              <button
+                type="submit"
+                className="btn-admin-submit"
+                disabled={loading}
+              >
+                {loading ? 'Authenticating...' : isLogin ? 'Sign In to Dashboard →' : 'Create Account & Enter →'}
               </button>
-            </form>
 
-            <p className="al-switch">
-              {isLogin ? "Don't have an account?" : 'Already have an account?'}
-              {' '}
-              <button className="al-switch-btn" onClick={switchMode}>
-                {isLogin ? 'Sign Up' : 'Login'}
-              </button>
-            </p>
+              <div className="al-switch-hint">
+                {isLogin ? (
+                  <span>Need an admin account? <button type="button" onClick={switchMode}>Register here</button></span>
+                ) : (
+                  <span>Already registered? <button type="button" onClick={switchMode}>Sign in</button></span>
+                )}
+              </div>
+            </form>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
 
 export default AdminLogin;
-

@@ -24,6 +24,9 @@ yarn-debug.log*
 .DS_Store
 Thumbs.db
 
+# Scratch and temporary image downloads in backend
+backend/*.jpg
+
 # IDE
 .vscode/
 .idea/

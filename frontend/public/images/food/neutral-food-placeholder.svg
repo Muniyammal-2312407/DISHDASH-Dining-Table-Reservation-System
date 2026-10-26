@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F8F4EE" />
+      <stop offset="100%" stop-color="#EBE2D6" />
+    </linearGradient>
+  </defs>
+  <rect width="600" height="400" fill="url(#bgGrad)" />
+  <g transform="translate(300, 160)">
+    <!-- Plate base -->
+    <ellipse cx="0" cy="0" rx="110" ry="60" fill="#FFFFFF" stroke="#DCD2C3" stroke-width="3"/>
+    <ellipse cx="0" cy="0" rx="90" ry="45" fill="#FFFFFF" stroke="#EDE5D8" stroke-width="2"/>
+    <!-- Cloche dome -->
+    <path d="M -70 5 A 70 50 0 0 1 70 5 Z" fill="none" stroke="#BE5A28" stroke-width="4" stroke-linecap="round"/>
+    <line x1="-80" y1="5" x2="80" y2="5" stroke="#BE5A28" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="0" cy="-45" r="7" fill="#BE5A28"/>
+  </g>
+  <!-- Text -->
+  <text x="300" y="275" font-family="'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="700" fill="#463228" text-anchor="middle">DISHDASH</text>
+  <text x="300" y="305" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="500" fill="#8C786E" text-anchor="middle">Freshly Prepared Cuisine</text>
+</svg>

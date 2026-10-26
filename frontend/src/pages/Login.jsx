@@ -11,14 +11,14 @@ const Login = () => {
   const handleCustomerProceed = (e) => {
     e.preventDefault();
     if (!customerName.trim()) {
-      toast.error('Please enter your name to continue');
+      toast.error('Please enter your name to proceed to table selection');
       return;
     }
     setLoading(true);
     localStorage.setItem('customerName', customerName.trim());
     setTimeout(() => {
       navigate('/tables');
-    }, 600);
+    }, 250);
   };
 
   const handleAdminPortal = () => {
@@ -27,123 +27,121 @@ const Login = () => {
 
   return (
     <div className="login-page">
-      {/* Animated background particles */}
-      <div className="bg-particles">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className={`particle particle-${i + 1}`} />
-        ))}
-      </div>
-
-      <div className="login-wrapper">
-        {/* Hero Left */}
-        <div className="login-hero">
-          <div className="hero-badge">🌟 Premium Dining Experience</div>
-          <h1 className="hero-title">
-            Food<span className="brand-accent">Heaven</span>
-          </h1>
-          <p className="hero-tagline">
-            Where Every Bite is a Journey of Flavor
-          </p>
-          <div className="hero-features">
-            <div className="feature-item">
-              <span className="feature-icon">🍽️</span>
-              <span>200+ Menu Items</span>
-            </div>
-            <div className="feature-item">
-              <span className="feature-icon">⚡</span>
-              <span>Fast Ordering</span>
-            </div>
-            <div className="feature-item">
-              <span className="feature-icon">💳</span>
-              <span>Easy Payments</span>
-            </div>
-            <div className="feature-item">
-              <span className="feature-icon">📊</span>
-              <span>Real-time Tracking</span>
-            </div>
+      {/* Top Navbar */}
+      <header className="login-nav">
+        <div className="nav-container">
+          <div className="nav-brand">
+            <span className="brand-badge">DISHDASH</span>
+            <span className="brand-sub">Table Dining & Orders</span>
           </div>
-          <div className="hero-decoration">
-            <span className="food-float">🍕</span>
-            <span className="food-float delay-1">🍜</span>
-            <span className="food-float delay-2">🍣</span>
-            <span className="food-float delay-3">🍰</span>
-          </div>
+          <button
+            type="button"
+            className="nav-admin-link"
+            onClick={handleAdminPortal}
+          >
+            Admin Portal →
+          </button>
         </div>
+      </header>
 
-        {/* Right: Action Cards */}
-        <div className="login-cards">
-          <div className="cards-header">
-            <h2>Welcome Back!</h2>
-            <p>How would you like to proceed?</p>
-          </div>
-
-          {/* Customer Card */}
-          <div className="action-card customer-card">
-            <div className="card-icon">
-              <span>👥</span>
+      {/* Main Container */}
+      <main className="login-main">
+        <div className="login-card-container">
+          {/* Welcome Hero Banner */}
+          <section className="login-header login-hero-banner">
+            <div className="hero-img-backdrop">
+              <img
+                src="/images/food/chicken-biryani.jpg"
+                alt="Artisanal Fine Dining"
+                className="hero-bg-img"
+              />
+              <div className="hero-dark-overlay" />
             </div>
-            <div className="card-content">
-              <h3>Customer Order</h3>
-              <p>Browse menu, place orders and enjoy your meal</p>
+            <div className="hero-content">
+              <span className="section-pill hero-pill">Fine Dining & Table Reservations</span>
+              <h1 className="login-heading">Artisanal Cuisine, Timeless Hospitality</h1>
+              <p className="login-subtext">
+                Reserve your table, explore our chef's seasonal creations, and enjoy an unhurried dining experience prepared fresh upon order.
+              </p>
+              <div className="hero-highlights">
+                <span className="hero-highlight-tag">Chef's Seasonal Menu</span>
+                <span className="hero-highlight-tag">Guaranteed Table Booking</span>
+                <span className="hero-highlight-tag">Attentive Table Service</span>
+              </div>
+            </div>
+          </section>
 
-              <form onSubmit={handleCustomerProceed} className="name-form">
-                <div className="input-wrapper">
-                  <span className="input-icon">👤</span>
+          <div className="login-grid">
+            {/* Customer Entry Card */}
+            <div className="entry-card customer-entry">
+              <div className="entry-header">
+                <div className="entry-icon">🍽️</div>
+                <div>
+                  <h2 className="entry-title">Customer Dining</h2>
+                  <p className="entry-desc">Start your order by entering your name</p>
+                </div>
+              </div>
+
+              <form onSubmit={handleCustomerProceed} className="entry-form">
+                <div className="form-group">
+                  <label htmlFor="customerName" className="form-label">
+                    Your Name
+                  </label>
                   <input
+                    id="customerName"
                     type="text"
-                    placeholder="Enter your name to continue..."
+                    className="form-input"
+                    placeholder="e.g. Rahul Sharma"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     maxLength={40}
                     autoFocus
                   />
+                  <span className="form-hint">Used for order tracking and your table bill</span>
                 </div>
+
                 <button
                   type="submit"
-                  className="proceed-btn"
+                  className="btn-primary"
                   disabled={loading}
                 >
-                  {loading ? (
-                    <span className="btn-loading">
-                      <span className="spinner" />
-                      Processing...
-                    </span>
-                  ) : (
-                    <>
-                      🍽️ Start Ordering
-                      <span className="btn-arrow">→</span>
-                    </>
-                  )}
+                  {loading ? 'Opening Tables...' : 'Select Table & View Menu →'}
                 </button>
               </form>
             </div>
-          </div>
 
-          {/* Divider */}
-          <div className="divider">
-            <span>or</span>
-          </div>
+            {/* Admin Quick Card */}
+            <div className="entry-card admin-entry">
+              <div className="entry-header">
+                <div className="entry-icon">👨‍💼</div>
+                <div>
+                  <h2 className="entry-title">Restaurant Management</h2>
+                  <p className="entry-desc">Kitchen staff & manager portal</p>
+                </div>
+              </div>
 
-          {/* Admin Card */}
-          <div className="action-card admin-card" onClick={handleAdminPortal}>
-            <div className="card-icon admin-icon">
-              <span>👨‍💼</span>
+              <div className="admin-entry-body">
+                <p className="admin-info-text">
+                  Update item availability, track order preparation in real time, and oversee daily dining tables.
+                </p>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={handleAdminPortal}
+                >
+                  Staff & Admin Login →
+                </button>
+              </div>
             </div>
-            <div className="card-content">
-              <h3>Admin Portal</h3>
-              <p>Manage menu, orders & monitor restaurant performance</p>
-              <button type="button" className="admin-btn">
-                🔐 Admin Login
-                <span className="btn-arrow">→</span>
-              </button>
-            </div>
           </div>
 
-          <p className="footer-note">
-            🔒 Secure • Fast • Reliable Restaurant Management
-          </p>
+          <div className="login-footer-info">
+            <div className="info-chip">✨ Fresh Ingredients</div>
+            <div className="info-chip">⏱️ Fast Table Service</div>
+            <div className="info-chip">📱 Contactless Ordering</div>
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

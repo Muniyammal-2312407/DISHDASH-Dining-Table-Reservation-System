@@ -16,4 +16,6 @@ services:
         sync: false   # You will set this in Render dashboard
       - key: JWT_SECRET
         sync: false   # You will set this in Render dashboard
+      - key: PABBLY_BOOKING_WEBHOOK_URL
+        sync: false   # Optional: Set in Render dashboard for Pabbly Connect booking automation
     healthCheckPath: /
